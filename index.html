@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#173d2b"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg">
+<title>Lerntrainer – Mathe & Englisch</title>
+<style>
+:root{--green:#1e5638;--green2:#2f7950;--bg:#f3f6f2;--card:#fff;--ink:#17251c;--muted:#657268;--line:#e1e8e1;--soft:#eaf3ec;--orange:#fff3dc;--red:#fff0ed}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5}
+header{background:linear-gradient(135deg,#153d2a,#2d7047);color:white;padding:25px 18px 23px;border-radius:0 0 25px 25px}
+header .tag{font-size:12px;letter-spacing:.1em;text-transform:uppercase;opacity:.8;font-weight:700}h1{font-size:27px;line-height:1.15;margin:7px 0}header p{margin:6px 0 0;color:#e0eee3;font-size:14px}
+main{max-width:760px;margin:auto;padding:15px 14px 42px}.tabs{display:flex;gap:9px;margin:0 0 14px}.tab{flex:1;border:1px solid var(--line);background:white;color:var(--ink);padding:13px;border-radius:14px;font-weight:750;font-size:15px}.tab.active{background:var(--green);border-color:var(--green);color:white}
+.panel,.topic-card,.task,.example{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px #183b2410}
+.toprow{display:flex;align-items:center;justify-content:space-between;gap:10px}.eyebrow{font-size:11px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+h2{font-size:21px;margin:3px 0 10px}h3{font-size:16px;margin:0 0 8px}.muted{color:var(--muted);font-size:13px}
+select, input{font:inherit}select{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);margin:7px 0 3px}
+.pills{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}.pill{border:1px solid var(--line);border-radius:99px;background:white;padding:8px 12px;font-size:13px;font-weight:650;color:var(--ink)}.pill.active{background:var(--soft);border-color:#9dbba4;color:var(--green)}
+.formula{background:var(--soft);border-radius:13px;padding:13px;margin:12px 0;font-weight:750;color:#17462d;font-size:17px;text-align:center}
+ul{padding-left:21px;margin:8px 0}li{margin:5px 0}.example{background:#fbfcfa;box-shadow:none;margin:8px 0;padding:13px}.step{padding:8px 10px;background:#f1f5f1;border-radius:9px;margin:6px 0;font-size:14px}.answerline{font-weight:750;color:var(--green);margin-top:7px}
+.task{padding:14px}.taskhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.level{font-size:11px;font-weight:800;border-radius:99px;padding:4px 8px;background:#eaf3ec;color:#205b37}.level.mid{background:#fff3dc;color:#80551a}.level.hard{background:#fff0ed;color:#9a3e2c}
+.task input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;margin:9px 0 8px;background:white}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:0;border-radius:11px;background:var(--green);color:white;padding:10px 14px;font-weight:750;font-size:13px}.btn.secondary{background:#edf2ed;color:#244a32}.btn:active{transform:scale(.98)}
+.feedback{padding:10px 12px;border-radius:10px;margin-top:9px;font-size:13px}.good{background:#e9f6ec;color:#1c6234}.bad{background:#fff0ed;color:#963e2e}.solution{background:#f2f5f1;border-radius:10px;padding:11px;margin-top:8px;font-size:13px}
+.progress{height:8px;background:#e4ebe4;border-radius:99px;overflow:hidden;margin-top:7px}.progress>div{height:100%;background:#3d8959;width:0;transition:width .2s}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:10px}
+.hidden{display:none!important}.note{font-size:13px;background:#fff7e8;padding:11px;border-radius:11px;color:#684c20}
+@media(min-width:620px){header{padding:32px max(22px,calc((100vw - 720px)/2)) 26px}main{padding-top:22px}.taskgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.taskgrid .task{margin:0}}
+</style>
+</head>
+<body>
+<header>
+  <div class="tag">Dein persönlicher Lernbereich</div>
+  <h1>Lerntrainer<br>Mathe & Englisch</h1>
+  <p>Erst verstehen. Dann üben. Schritt für Schritt sicherer werden.</p>
+</header>
+<main>
+  <div class="tabs">
+    <button class="tab active" id="mathTab" onclick="setSubject('Mathe')">📐 Mathe</button>
+    <button class="tab" id="engTab" onclick="setSubject('Englisch')">🇬🇧 Englisch</button>
+    <button class="tab" id="vocabTab" onclick="showVocab()">📚 Vokabeln</button>
+  </div>
+  <section class="panel">
+    <div class="toprow"><div><div class="eyebrow">Dein Lernfortschritt</div><strong id="progressText">0 Aufgaben richtig</strong></div><span id="progressPercent" class="muted">0 %</span></div>
+    <div class="progress"><div id="progressBar"></div></div>
+    <label class="eyebrow" for="topicSelect" style="display:block;margin-top:15px">Thema auswählen</label>
+    <select id="topicSelect" onchange="renderTopic()"></select>
+    <div class="pills" id="levelPills">
+      <button class="pill active" onclick="setLevel('Alle',this)">Alle Aufgaben</button>
+      <button class="pill" onclick="setLevel('Leicht',this)">Leicht</button>
+      <button class="pill" onclick="setLevel('Mittel',this)">Mittel</button>
+      <button class="pill" onclick="setLevel('Schwer',this)">Schwer</button>
+    </div>
+  </section>
+  <div id="content"></div>
+  <footer>Dein Lerntrainer · Mathe und Englisch · Üben in deinem Tempo</footer>
+</main>
+<script>
+const lessons = {
+"Prozentrechnung": {
+intro:"Prozent heißt „von hundert“. Wenn etwas 20 % beträgt, sind das 20 von 100 gleich großen Teilen. Prozentrechnung begegnet dir zum Beispiel bei Rabatten, Preissteigerungen, Umfragen und Zinsen.",
+parts:["Der Grundwert (G) ist das Ganze, also zum Beispiel der ursprüngliche Preis.","Der Prozentsatz (p %) gibt an, wie viel Prozent du suchst.","Der Prozentwert (W) ist der Anteil, den du ausrechnest."],
+formula:"Prozentwert W = Grundwert G · Prozentsatz p / 100",
+examples:[["10 % von 250 €","10 % bedeutet 10 von 100.","250 · 10 : 100 = 25","10 % von 250 € sind 25 €."],["15 % von 80 €","Gesucht ist der Anteil, also der Prozentwert.","80 · 15 : 100 = 12","Das Ergebnis beträgt 12 €."],["Ein Fahrrad kostet 400 €. Es gibt 20 % Rabatt.","Zuerst den Rabatt ausrechnen: 400 · 20 : 100 = 80 €.","Dann den Rabatt vom ursprünglichen Preis abziehen: 400 € − 80 € = 320 €.","Der neue Preis beträgt 320 €."],["Ein Preis steigt von 500 € um 8 %.","Die Erhöhung beträgt 500 · 8 : 100 = 40 €.","Neuer Preis: 500 € + 40 € = 540 €.","Der neue Preis beträgt 540 €."]],
+tasks:[["Leicht","Wie viel sind 10 % von 200 €?","20","200 · 10 : 100 = 20 €."],["Leicht","Wie viel sind 25 % von 80?","20","80 · 25 : 100 = 20."],["Leicht","Wie viel sind 50 % von 64?","32","50 % ist die Hälfte: 64 : 2 = 32."],["Mittel","Wie viel sind 15 % von 300 €?","45","300 · 15 : 100 = 45 €."],["Mittel","Ein Gerät kostet 500 €. Du bekommst 20 % Rabatt. Wie hoch ist der Rabatt?","100","500 · 20 : 100 = 100 € Rabatt."],["Mittel","Wie viel sind 12 % von 150?","18","150 · 12 : 100 = 18."],["Schwer","Ein Trecker kostet 40.000 €. Der Preis steigt um 8 %. Wie hoch ist der neue Preis?","43200","Erhöhung: 40.000 · 8 : 100 = 3.200 €. Neuer Preis: 43.200 €."],["Schwer","Eine Maschine kostet nach 10 % Rabatt 900 €. Wie teuer war sie vorher?","1000","900 € entsprechen 90 %. Daher: 900 : 90 · 100 = 1.000 €."]]},
+"Bruchrechnung": {
+intro:"Ein Bruch beschreibt einen Teil eines Ganzen. Der Nenner unten sagt, in wie viele gleich große Teile das Ganze geteilt ist. Der Zähler oben sagt, wie viele dieser Teile gemeint sind. Bei Brüchen ist es wichtig, die Rechenart zu beachten.",
+parts:["Addieren und Subtrahieren: Die Nenner müssen gleich sein. Wenn sie verschieden sind, suchst du einen gemeinsamen Nenner.","Multiplizieren: Zähler mal Zähler und Nenner mal Nenner.","Dividieren: Den zweiten Bruch umdrehen und anschließend multiplizieren.","Kürzen: Zähler und Nenner durch dieselbe Zahl teilen."],
+formula:"Addition: a/b + c/b = (a+c)/b",
+examples:[["Gleiche Nenner: 1/4 + 2/4","Die Nenner sind schon gleich. Deshalb addierst du nur die Zähler.","1/4 + 2/4 = 3/4","Ergebnis: 3/4."],["Verschiedene Nenner: 1/2 + 1/4","Der gemeinsame Nenner ist 4. Deshalb wird 1/2 zu 2/4 erweitert.","2/4 + 1/4 = 3/4","Ergebnis: 3/4."],["Multiplizieren: 2/3 · 3/4","Oben mal oben und unten mal unten rechnen.","(2 · 3)/(3 · 4) = 6/12 = 1/2","Ergebnis gekürzt: 1/2."],["Dividieren: 3/4 : 1/2","Den zweiten Bruch umdrehen und mal rechnen.","3/4 · 2/1 = 6/4 = 3/2","Ergebnis: 3/2."]],
+tasks:[["Leicht","1/5 + 2/5 = ?","3/5","Gleiche Nenner: 1 + 2 = 3. Nenner 5 bleibt."],["Leicht","3/8 − 1/8 = ?","2/8","3/8 − 1/8 = 2/8; gekürzt wäre das 1/4."],["Leicht","Wie viel ist 1/2 als Dezimalzahl?","0,5","1 geteilt durch 2 ergibt 0,5."],["Mittel","1/2 + 1/3 = ?","5/6","Auf Sechstel erweitern: 3/6 + 2/6 = 5/6."],["Mittel","2/3 · 3/5 = ?","2/5","6/15 kürzen: 6/15 = 2/5."],["Mittel","3/4 − 1/2 = ?","1/4","1/2 wird zu 2/4. Dann 3/4 − 2/4 = 1/4."],["Schwer","3/4 : 1/2 = ?","3/2","3/4 · 2/1 = 6/4 = 3/2."],["Schwer","2/3 + 3/4 = ?","17/12","Auf Zwölftel erweitern: 8/12 + 9/12 = 17/12."]]},
+"Gleichungen": {
+intro:"Eine Gleichung ist wie eine Waage: Links und rechts muss derselbe Wert stehen. Das Ziel ist, die unbekannte Zahl x allein auf eine Seite zu bringen. Dafür machst du auf beiden Seiten dieselbe Rechenoperation.",
+parts:["Steht bei x eine Zahl plus, ziehst du diese Zahl auf beiden Seiten ab.","Wird x mit einer Zahl multipliziert, teilst du beide Seiten durch diese Zahl.","Bei mehreren Schritten arbeitest du rückwärts: zuerst plus/minus, danach mal/geteilt.","Zum Schluss kannst du deine Lösung durch Einsetzen prüfen."],
+formula:"Beispiel: 2x + 4 = 14  →  2x = 10  →  x = 5",
+examples:[["x + 5 = 12","Auf beiden Seiten 5 abziehen.","x = 12 − 5","x = 7."],["3x = 18","Beide Seiten durch 3 teilen.","x = 18 : 3","x = 6."],["2x + 4 = 14","Zuerst 4 abziehen: 2x = 10.","Dann durch 2 teilen: x = 10 : 2.","x = 5."],["Probe für 2x + 4 = 14","Setze x = 5 in die ursprüngliche Gleichung ein.","2 · 5 + 4 = 10 + 4 = 14.","Links und rechts sind 14. Die Lösung stimmt."]],
+tasks:[["Leicht","x + 7 = 15. Wie groß ist x?","8","Auf beiden Seiten 7 abziehen: x = 15 − 7 = 8."],["Leicht","x − 4 = 9. Wie groß ist x?","13","Auf beiden Seiten 4 addieren: x = 9 + 4 = 13."],["Leicht","5x = 35. Wie groß ist x?","7","Beide Seiten durch 5 teilen: x = 7."],["Mittel","3x = 21. Wie groß ist x?","7","21 : 3 = 7."],["Mittel","2x + 5 = 17. Wie groß ist x?","6","5 abziehen: 2x = 12. Durch 2 teilen: x = 6."],["Mittel","4x − 3 = 13. Wie groß ist x?","4","3 addieren: 4x = 16. Durch 4 teilen: x = 4."],["Schwer","4x − 7 = 21. Wie groß ist x?","7","7 addieren: 4x = 28. Durch 4 teilen: x = 7."],["Schwer","3(x + 2) = 24. Wie groß ist x?","6","Durch 3 teilen: x + 2 = 8. Dann 2 abziehen: x = 6."]]},
+"Potenzen und Wurzeln": {
+intro:"Eine Potenz ist eine Kurzschreibweise für eine wiederholte Multiplikation. Die Zahl unten heißt Basis, die kleine hochgestellte Zahl heißt Exponent. Eine Quadratwurzel fragt umgekehrt: Welche Zahl mal sich selbst ergibt die Zahl unter der Wurzel?",
+parts:["3² bedeutet 3 · 3, also 9.","2³ bedeutet 2 · 2 · 2, also 8.","√49 = 7, weil 7 · 7 = 49.","Achte auf die Anzahl der Faktoren: 4² ist nicht 4 · 2, sondern 4 · 4."],
+formula:"a² = a · a     |     √a = Zahl, deren Quadrat a ist",
+examples:[["2³","Die 2 wird dreimal als Faktor genommen.","2 · 2 · 2 = 8","Ergebnis: 8."],["5²","Die 5 wird zweimal multipliziert.","5 · 5 = 25","Ergebnis: 25."],["√64","Gesucht ist eine Zahl, die mit sich selbst 64 ergibt.","8 · 8 = 64","Also ist √64 = 8."],["10² − √36","Zuerst Potenz und Wurzel berechnen: 100 und 6.","100 − 6 = 94","Ergebnis: 94."]],
+tasks:[["Leicht","Wie viel ist 4²?","16","4² = 4 · 4 = 16."],["Leicht","Wie viel ist √64?","8","8 · 8 = 64."],["Leicht","Wie viel ist 3²?","9","3 · 3 = 9."],["Mittel","Wie viel ist 3³?","27","3 · 3 · 3 = 27."],["Mittel","Wie viel ist √121?","11","11 · 11 = 121."],["Mittel","Wie viel ist 2⁴?","16","2 · 2 · 2 · 2 = 16."],["Schwer","Wie viel ist 2⁴ + √36?","22","2⁴ = 16 und √36 = 6. Zusammen 22."],["Schwer","Wie viel ist √144 − 3²?","3","√144 = 12 und 3² = 9. 12 − 9 = 3."]]},
+"Funktionen": {
+intro:"Eine Funktion ordnet einem x-Wert genau einen y-Wert zu. Bei linearen Funktionen ist der Graph eine Gerade. Die Form y = m · x + b hilft dir, Werte zu berechnen und den Graphen zu verstehen.",
+parts:["x ist der eingesetzte Wert; y ist das Ergebnis.","m beschreibt die Steigung: Wie stark verändert sich y, wenn x um 1 steigt?","b ist der y-Achsenabschnitt. Dort schneidet die Gerade die y-Achse.","Eine Wertetabelle hilft dir, Punkte für den Graphen zu finden."],
+formula:"Lineare Funktion: y = m · x + b",
+examples:[["y = 2x + 1 für x = 3","Setze für x die 3 ein.","y = 2 · 3 + 1 = 7","Der zugehörige y-Wert ist 7."],["y = 3x für x = 4","Setze x = 4 ein.","y = 3 · 4 = 12","Der Punkt lautet (4 | 12)."],["y = −x + 5 für x = 2","Setze x = 2 ein.","y = −2 + 5 = 3","Der y-Wert ist 3."],["y = 2x + 1: zwei Punkte","Für x = 0 ist y = 1. Für x = 2 ist y = 5.","Du erhältst die Punkte (0 | 1) und (2 | 5).","Verbinde die Punkte mit einer Geraden."]],
+tasks:[["Leicht","y = 2x. Berechne y für x = 3.","6","y = 2 · 3 = 6."],["Leicht","y = x + 4. Berechne y für x = 2.","6","y = 2 + 4 = 6."],["Leicht","y = 5x. Berechne y für x = 2.","10","5 · 2 = 10."],["Mittel","y = 3x + 2. Berechne y für x = 4.","14","3 · 4 + 2 = 14."],["Mittel","y = −2x + 10. Berechne y für x = 3.","4","−2 · 3 + 10 = 4."],["Mittel","y = 4x − 1. Berechne y für x = 3.","11","4 · 3 − 1 = 11."],["Schwer","y = 0,5x − 3. Berechne y für x = 8.","1","0,5 · 8 − 3 = 4 − 3 = 1."],["Schwer","y = −3x + 7. Berechne y für x = −2.","13","−3 · (−2) + 7 = 6 + 7 = 13."]]},
+"Pythagoras": {
+intro:"Der Satz des Pythagoras gilt nur in rechtwinkligen Dreiecken. Die beiden Seiten, die den rechten Winkel bilden, heißen Katheten a und b. Die längste Seite gegenüber dem rechten Winkel heißt Hypotenuse c.",
+parts:["Wenn c gesucht ist, rechnest du a² + b² und ziehst daraus die Wurzel.","Wenn eine Kathete gesucht ist, ziehst du das Quadrat der bekannten Kathete ab: a² = c² − b².","Die Hypotenuse liegt immer gegenüber dem rechten Winkel und ist die längste Seite.","Vergiss bei Sachaufgaben die Einheit nicht."],
+formula:"a² + b² = c²",
+examples:[["a = 3 cm, b = 4 cm; c gesucht","Setze in die Formel ein: 3² + 4² = c².","9 + 16 = 25. Dann √25 = 5.","c = 5 cm."],["a = 5 cm, b = 12 cm; c gesucht","5² + 12² = c².","25 + 144 = 169. √169 = 13.","c = 13 cm."],["c = 10 cm, a = 6 cm; b gesucht","b² = c² − a².","b² = 100 − 36 = 64. √64 = 8.","b = 8 cm."],["Prüfen, ob ein Dreieck rechtwinklig ist","Die längste Seite ist 13 cm. Prüfe: 5² + 12² = 13².","25 + 144 = 169.","Die Gleichung stimmt. Das Dreieck ist rechtwinklig."]],
+tasks:[["Leicht","a = 3 cm und b = 4 cm. Wie lang ist c? (cm)","5","c = √(3² + 4²) = √25 = 5 cm."],["Leicht","a = 6 cm und b = 8 cm. Wie lang ist c? (cm)","10","c = √(36 + 64) = √100 = 10 cm."],["Mittel","a = 5 cm und b = 12 cm. Wie lang ist c? (cm)","13","c = √(25 + 144) = √169 = 13 cm."],["Mittel","c = 13 cm und a = 5 cm. Wie lang ist b? (cm)","12","b = √(169 − 25) = √144 = 12 cm."],["Mittel","c = 10 cm und b = 6 cm. Wie lang ist a? (cm)","8","a = √(100 − 36) = √64 = 8 cm."],["Schwer","a = 8 cm und b = 15 cm. Wie lang ist c? (cm)","17","c = √(64 + 225) = √289 = 17 cm."],["Schwer","Eine Leiter steht 12 m von einer Wand entfernt und reicht 13 m hoch. Wie lang ist die Leiter? (m)","17.69","Die Leiter ist die Hypotenuse: c = √(12² + 13²) = √313 ≈ 17,69 m.","Schwer"]]},
+"Simple Present": {
+intro:"Das Simple Present verwendest du für Gewohnheiten, regelmäßige Handlungen, allgemeine Fakten und feste Abläufe. Es sagt nicht unbedingt, dass etwas genau jetzt passiert.",
+parts:["Bei I, you, we und they steht die Grundform: I work, they play.","Bei he, she und it kommt meistens -s dazu: he works, she plays.","Endet ein Verb auf -ch, -sh, -ss, -x oder -o, kommt häufig -es dazu: watches, goes.","Bei Verneinungen verwendest du don't oder doesn't. Nach doesn't steht wieder die Grundform: She doesn't play."],
+formula:"I / you / we / they + Grundform  ·  he / she / it + Verb-s",
+examples:[["I work on a farm.","I ist die Person. Das Verb bleibt in der Grundform.","I work on a farm every weekend.","Ich arbeite jedes Wochenende auf einem Bauernhof."],["She plays football.","She ist dritte Person Singular. Deshalb bekommt play ein -s.","She plays football every Monday.","Sie spielt jeden Montag Fußball."],["He watches TV.","Watch endet auf -ch. Deshalb kommt -es dazu.","He watches TV in the evening.","Er schaut abends fern."],["She doesn't drive a tractor.","Bei she brauchst du doesn't. Das Verb danach bleibt Grundform.","She doesn't drive a tractor.","Sie fährt keinen Trecker."]],
+tasks:[["Leicht","She ___ (play) football every day.","plays","Bei she bekommt play ein -s: plays."],["Leicht","I ___ (work) on a farm.","work","Bei I steht die Grundform work."],["Leicht","They ___ (like) tractors.","like","Bei they bleibt das Verb in der Grundform."],["Mittel","He ___ (watch) TV every evening.","watches","Watch endet auf -ch. Deshalb watches."],["Mittel","My parents ___ (work) in the garden.","work","My parents entspricht they: work."],["Mittel","She doesn't ___ (like) coffee.","like","Nach doesn't steht die Grundform like."],["Schwer","My father ___ (go) to work every morning.","goes","Bei he/she/it wird go zu goes."],["Schwer","The machine ___ (make) a strange noise.","makes","The machine ist es/it. Daher makes."]]},
+"Present Progressive": {
+intro:"Das Present Progressive beschreibt Handlungen, die gerade jetzt passieren oder nur vorübergehend stattfinden. Oft erkennst du es an Signalwörtern wie now, right now oder at the moment.",
+parts:["Du brauchst eine Form von to be: am, is oder are.","Danach kommt das Verb mit -ing.","I → am; he/she/it → is; you/we/they → are.","Bei manchen Verben fällt ein stummes e weg: make → making. Bei sit wird der Endkonsonant verdoppelt: sitting."],
+formula:"am / is / are + Verb-ing",
+examples:[["I am working.","I bekommt am. An work hängst du -ing.","I am working right now.","Ich arbeite gerade."],["She is driving.","She bekommt is. Drive verliert das e: driving.","She is driving the tractor now.","Sie fährt gerade den Trecker."],["They are playing.","They bekommt are. Play wird playing.","They are playing football at the moment.","Sie spielen gerade Fußball."],["He isn't repairing the machine.","Verneinung: am/is/are + not + Verb-ing.","He is not repairing the machine.","Er repariert die Maschine gerade nicht."]],
+tasks:[["Leicht","I ___ (work) now.","am working","I + am + working."],["Leicht","She ___ (drive) right now.","is driving","She + is + driving."],["Leicht","They ___ (play) football at the moment.","are playing","They + are + playing."],["Mittel","He ___ (repair) the tractor now.","is repairing","He + is + repairing."],["Mittel","We ___ (prepare) the field at the moment.","are preparing","We + are + preparing."],["Mittel","The dog ___ (run) in the garden.","is running","The dog ist it. Run verdoppelt das n: running."],["Schwer","I ___ (not / watch) TV right now.","am not watching","Verneinung: am not + watching."],["Schwer","Why ___ you ___ (laugh)?","are laughing","Frage: Are + you + laughing?"]]},
+"Simple Past": {
+intro:"Das Simple Past brauchst du für Handlungen, die in der Vergangenheit abgeschlossen sind. Häufige Signalwörter sind yesterday, last week, two days ago oder in 2024.",
+parts:["Regelmäßige Verben bekommen -ed: work → worked.","Unregelmäßige Verben haben eine eigene zweite Form: go → went, see → saw, buy → bought.","In Fragen und Verneinungen verwendest du did/didn't. Danach steht die Grundform: Did you go? / I didn't go.","Bei to be verwendest du was oder were."],
+formula:"Regelmäßig: Verb + -ed  ·  unregelmäßig: 2. Verbform",
+examples:[["I worked yesterday.","Work ist regelmäßig. Deshalb kommt -ed dazu.","I worked on the farm yesterday.","Ich arbeitete gestern auf dem Hof."],["She went home.","Go ist unregelmäßig. Die zweite Form lautet went.","She went home after school.","Sie ging nach der Schule nach Hause."],["We saw a tractor.","See wird in der zweiten Form zu saw.","We saw a new tractor last week.","Wir sahen letzte Woche einen neuen Trecker."],["Did you play football?","Bei Fragen steht did vor der Person. Das Verb bleibt Grundform.","Did you play football yesterday?","Hast du gestern Fußball gespielt?"]],
+tasks:[["Leicht","Yesterday I ___ (work).","worked","Work ist regelmäßig: worked."],["Leicht","She ___ (play) football.","played","Play + ed = played."],["Leicht","We ___ (watch) a film yesterday.","watched","Watch + ed = watched."],["Mittel","He ___ (go) home.","went","Go ist unregelmäßig: went."],["Mittel","We ___ (see) a tractor.","saw","See wird zu saw."],["Mittel","They ___ (buy) a new machine.","bought","Buy wird zu bought."],["Schwer","I didn't ___ (know) the answer.","know","Nach didn't steht die Grundform know."],["Schwer","___ you ___ (finish) your homework?","Did finish","Frage im Simple Past: Did + you + finish."]]},
+"Past Progressive": {
+intro:"Das Past Progressive beschreibt, was zu einem bestimmten Zeitpunkt in der Vergangenheit gerade passierte. Häufig wird es mit Simple Past kombiniert: Eine längere Handlung war im Gange, als etwas anderes passierte.",
+parts:["Bildung: was oder were + Verb-ing.","I/he/she/it → was; you/we/they → were.","Signalwörter können while oder at 6 pm yesterday sein.","Beispiel: I was working when he called. Die Arbeit lief gerade, als er anrief."],
+formula:"was / were + Verb-ing",
+examples:[["I was working at 5 pm.","I bekommt was. Work wird zu working.","I was working at 5 pm yesterday.","Ich arbeitete gestern um 17 Uhr gerade."],["They were playing.","They bekommt were + playing.","They were playing when it started to rain.","Sie spielten gerade, als es anfing zu regnen."],["She was driving when I called.","Die Fahrt lief gerade. Der Anruf unterbrach sie.","She was driving when I called her.","Sie fuhr gerade, als ich sie anrief."]],
+tasks:[["Leicht","I ___ (work) at 5 pm yesterday.","was working","I + was + working."],["Leicht","They ___ (play) football.","were playing","They + were + playing."],["Mittel","She ___ (drive) home.","was driving","She + was + driving."],["Mittel","We ___ (watch) TV at 8 pm.","were watching","We + were + watching."],["Mittel","He ___ (repair) the machine.","was repairing","He + was + repairing."],["Schwer","I ___ (sleep) when the phone rang.","was sleeping","Die längere Handlung war im Gange: was sleeping."],["Schwer","They ___ (work) while it was raining.","were working","They entspricht were: were working."],["Schwer","What ___ you ___ (do) at 7 pm?","were doing","Frage: What were you doing?"]]},
+"Present Perfect": {
+intro:"Das Present Perfect verbindet Vergangenheit und Gegenwart. Es beschreibt zum Beispiel Erfahrungen oder Handlungen, deren Ergebnis jetzt wichtig ist. Eine genaue abgeschlossene Zeit wie yesterday passt normalerweise nicht dazu.",
+parts:["Bildung: have/has + dritte Verbform (past participle).","I/you/we/they → have; he/she/it → has.","Regelmäßige Verben: worked, played. Unregelmäßige: gone, seen, bought.","Typische Signalwörter: already, just, yet, ever, never, since und for."],
+formula:"have / has + past participle (3. Verbform)",
+examples:[["I have finished my homework.","I bekommt have. Finish ist regelmäßig: finished.","I have finished my homework.","Ich habe meine Hausaufgaben fertig gemacht."],["She has gone home.","She bekommt has. Die dritte Form von go ist gone.","She has gone home.","Sie ist nach Hause gegangen."],["We have seen this film.","Die dritte Form von see ist seen.","We have seen this film before.","Wir haben diesen Film schon gesehen."],["He has lived here for five years.","For five years beschreibt einen Zeitraum bis jetzt.","He has lived here for five years.","Er wohnt seit fünf Jahren hier."]],
+tasks:[["Leicht","I ___ (finish) my homework.","have finished","I + have + finished."],["Leicht","She ___ (play) football.","has played","She + has + played."],["Mittel","He ___ (go) home.","has gone","Go – went – gone."],["Mittel","We ___ (see) the film.","have seen","See – saw – seen."],["Mittel","They ___ (buy) a new tractor.","have bought","Buy – bought – bought."],["Schwer","She ___ (live) here for five years.","has lived","She + has + lived."],["Schwer","I have never ___ (be) to London.","been","Be – was/were – been."],["Schwer","Have you ever ___ (ride) a horse?","ridden","Ride – rode – ridden."]]},
+"Past Perfect": {
+intro:"Das Past Perfect beschreibt eine Handlung, die vor einer anderen Handlung in der Vergangenheit passiert war. Es ist also die „Vorvergangenheit“. Oft stehen zwei Ereignisse in einem Satz.",
+parts:["Bildung: had + dritte Verbform (past participle).","Had ist bei allen Personen gleich: I had, she had, they had.","Die Handlung, die zuerst passiert war, steht oft im Past Perfect.","Signalwörter können already und before sein."],
+formula:"had + past participle (3. Verbform)",
+examples:[["I had finished before he came.","Zuerst hatte ich fertiggemacht. Danach kam er.","I had finished my homework before he came.","Ich hatte meine Hausaufgaben fertig, bevor er kam."],["She had left before 8 pm.","Das Weggehen passierte vor 20 Uhr.","She had left before 8 pm.","Sie war vor 20 Uhr gegangen."],["They had eaten when we arrived.","Sie hatten schon gegessen, als wir ankamen.","They had eaten when we arrived.","Sie hatten gegessen, als wir ankamen."]],
+tasks:[["Leicht","I ___ (finish) before he arrived.","had finished","Had + finished."],["Leicht","She ___ (leave) before 8 pm.","had left","Had + left."],["Mittel","They ___ (eat) before we came.","had eaten","Eat – ate – eaten."],["Mittel","He ___ (do) his homework before dinner.","had done","Do – did – done."],["Mittel","We ___ (see) the film before.","had seen","See – saw – seen."],["Schwer","The train ___ (leave) when we arrived.","had left","Das Wegfahren geschah zuerst: had left."],["Schwer","After she ___ (finish), she went home.","had finished","Erst fertig werden, dann nach Hause gehen."],["Schwer","I was tired because I ___ (not / sleep).","had not slept","Verneinung: had not + dritte Verbform slept."]]},
+"Will-Future": {
+intro:"Das Will-Future verwendest du oft bei spontanen Entscheidungen, Versprechen, Angeboten und Vermutungen über die Zukunft. Es wird mit will und der Grundform gebildet.",
+parts:["Für alle Personen bleibt will gleich: I will, she will, they will.","Nach will steht immer die Grundform des Verbs.","Verneinung: will not oder won't.","Frage: Will + Person + Grundform?" ],
+formula:"will + Grundform des Verbs",
+examples:[["I will help you.","Nach will steht help in der Grundform.","I will help you with your homework.","Ich werde dir bei den Hausaufgaben helfen."],["It will rain tomorrow.","Eine Vermutung über die Zukunft.","It will rain tomorrow.","Morgen wird es regnen."],["She won't come.","Won't ist die Kurzform von will not.","She won't come tomorrow.","Sie wird morgen nicht kommen."]],
+tasks:[["Leicht","I ___ help you.","will","Will steht vor der Grundform help."],["Leicht","She ___ come tomorrow.","will","Will bleibt bei allen Personen gleich."],["Mittel","They ___ buy a new tractor.","will","Will + buy."],["Mittel","It ___ rain tomorrow.","will","Will + rain."],["Mittel","He ___ not forget.","will","Will not ist die Verneinung."],["Schwer","I think he ___ pass the exam.","will","Eine Vermutung über die Zukunft."],["Schwer","___ you help me?","Will","Frage: Will + you + help?"]]},
+"Going-to-Future": {
+intro:"Das Going-to-Future verwendest du für feste Pläne und Absichten. Du kannst es auch nutzen, wenn es deutliche Anzeichen dafür gibt, dass etwas gleich passieren wird.",
+parts:["Bildung: am/is/are + going to + Grundform.","I → am; he/she/it → is; you/we/they → are.","Das Verb nach going to bleibt in der Grundform.","Frage: Are you going to work? Verneinung: I'm not going to work."],
+formula:"am / is / are + going to + Grundform",
+examples:[["I am going to work.","I bekommt am. Danach kommt going to + work.","I am going to work tomorrow.","Ich werde morgen arbeiten."],["She is going to drive.","She bekommt is. Drive bleibt Grundform.","She is going to drive the tractor.","Sie wird den Trecker fahren."],["They are going to play.","They bekommt are.","They are going to play football.","Sie werden Fußball spielen."]],
+tasks:[["Leicht","I ___ going to work.","am","I + am going to."],["Leicht","She ___ going to drive.","is","She + is going to."],["Mittel","They ___ going to play.","are","They + are going to."],["Mittel","He ___ going to repair it.","is","He + is going to."],["Mittel","We ___ going to prepare the field.","are","We + are going to."],["Schwer","Look at those clouds! It ___ going to rain.","is","It + is going to."],["Schwer","___ you going to learn tonight?","Are","Frage: Are + you + going to."]]}
+};
+let subject="Mathe", level="Alle", solved=JSON.parse(localStorage.getItem("ltSolved")||"{}");
+function setSubject(s){subject=s;document.getElementById("mathTab").classList.toggle("active",s==="Mathe");document.getElementById("engTab").classList.toggle("active",s==="Englisch");document.getElementById("vocabTab").classList.remove("active");document.getElementById("topicSelect").style.display="block";document.getElementById("topicSelect").parentElement.querySelector(".eyebrow").style.display="block";document.getElementById("levelPills").style.display="flex";const names=s==="Mathe"?["Prozentrechnung","Bruchrechnung","Gleichungen","Potenzen und Wurzeln","Funktionen","Pythagoras"]:["Simple Present","Present Progressive","Simple Past","Past Progressive","Present Perfect","Past Perfect","Will-Future","Going-to-Future"];document.getElementById("topicSelect").innerHTML=names.map(n=>`<option>${n}</option>`).join("");renderTopic();}
+function setLevel(l,el){level=l;document.querySelectorAll("#levelPills .pill").forEach(x=>x.classList.remove("active"));el.classList.add("active");renderTopic();}
+function norm(s){return String(s).trim().toLowerCase().replace(/\s+/g,"").replace(/€/g,"").replace(/,/g,".");}
+function renderTopic(){
+ const name=document.getElementById("topicSelect").value, d=lessons[name]; if(!d)return;
+ let html=`<section class="panel"><div class="eyebrow">1 · Verstehen</div><h2>Erklärung: ${name}</h2><p>${d.intro}</p><h3>Das solltest du dir merken</h3><ul>${d.parts.map(x=>`<li>${x}</li>`).join("")}</ul><div class="formula">${d.formula}</div><div class="note">Lerntipp: Lies die Erklärung einmal in Ruhe. Schau dir danach die Beispiele an und versuche, den Rechenweg oder die Grammatik selbst nachzuvollziehen.</div></section>`;
+ html+=`<section class="panel"><div class="eyebrow">2 · Schritt für Schritt</div><h2>Beispiele mit Erklärung</h2>${d.examples.map((e,i)=>`<div class="example"><div class="eyebrow">Beispiel ${i+1}</div><h3>${e[0]}</h3>${e.slice(1,-1).map((st,j)=>`<div class="step">${st}</div>`).join("")}<div class="answerline">${e[e.length-1]}</div></div>`).join("")}</section>`;
+ let tasks=d.tasks.filter(t=>level==="Alle"||t[0]===level);
+ html+=`<section class="panel"><div class="eyebrow">3 · Selbst üben</div><h2>Deine Aufgaben</h2><p class="muted">${tasks.length} Aufgaben · Die Schwierigkeit steigt von leicht bis schwer.</p><div class="taskgrid">${tasks.map((t,i)=>{let id=name+"_"+d.tasks.indexOf(t),done=!!solved[id];return `<article class="task"><div class="taskhead"><strong>Aufgabe ${i+1}</strong><span class="level ${t[0]==="Mittel"?"mid":t[0]==="Schwer"?"hard":""}">${t[0]}</span></div><div>${t[1]}</div><input id="a_${i}" autocomplete="off" placeholder="Deine Antwort"><div class="actions"><button class="btn" onclick="checkTask('${encodeURIComponent(id)}',${i},'${encodeURIComponent(t[2])}','${encodeURIComponent(t[3])}')">Antwort prüfen</button><button class="btn secondary" onclick="toggleSolution(${i})">Lösung ansehen</button></div><div id="f_${i}"></div><div id="s_${i}" class="solution hidden"></div></article>`}).join("")}</div></section>`;
+ document.getElementById("content").innerHTML=html;updateProgress();
+}
+function checkTask(idEnc,i,answerEnc,explainEnc){
+ const id=decodeURIComponent(idEnc),expected=decodeURIComponent(answerEnc),explain=decodeURIComponent(explainEnc),actual=document.getElementById("a_"+i).value;
+ const f=document.getElementById("f_"+i);
+ if(norm(actual)===norm(expected)){solved[id]=true;localStorage.setItem("ltSolved",JSON.stringify(solved));f.innerHTML=`<div class="feedback good">✓ Richtig! ${explain}</div>`;}
+ else{f.innerHTML=`<div class="feedback bad">Noch nicht ganz. Prüfe deinen Rechenweg oder die Verbform. Du kannst es erneut versuchen.</div>`;}
+ updateProgress();
+}
+function toggleSolution(i){const el=document.getElementById("s_"+i);const topic=document.getElementById("topicSelect").value;const d=lessons[topic],tasks=d.tasks.filter(t=>level==="Alle"||t[0]===level);el.classList.toggle("hidden");const t=tasks[i];el.innerHTML=`<strong>Musterlösung: ${t[2]}</strong><br>${t[3]}`;}
+function updateProgress(){const count=Object.keys(solved).length;document.getElementById("progressText").textContent=count+" Aufgaben richtig";document.getElementById("progressPercent").textContent=count+" gelöst";document.getElementById("progressBar").style.width=Math.min(100,count/100*100)+"%";}
+
+const vocabSets = {
+ "Alltag":[
+  ["to get up","aufstehen"],["to go to school","zur Schule gehen"],["to have breakfast","frühstücken"],
+  ["to do homework","Hausaufgaben machen"],["to meet friends","Freunde treffen"],["to be late","zu spät sein"],
+  ["usually","gewöhnlich"],["sometimes","manchmal"],["always","immer"],["never","niemals"]
+ ],
+ "Farm & Technik":[
+  ["tractor","Trecker / Traktor"],["field","Feld"],["farm","Bauernhof"],["trailer","Anhänger"],
+  ["plough","Pflug"],["harvest","Ernte / ernten"],["to repair","reparieren"],["machine","Maschine"],
+  ["workshop","Werkstatt"],["to drive","fahren"]
+ ],
+ "Schule":[
+  ["subject","Schulfach / Thema"],["test","Prüfung"],["homework","Hausaufgaben"],["timetable","Stundenplan"],
+  ["to learn","lernen"],["to understand","verstehen"],["mistake","Fehler"],["answer","Antwort"],
+  ["question","Frage"],["to explain","erklären"]
+ ]
+};
+let vocabSet="Alltag", vocabIndex=0, vocabDirection="en-de", vocabFlipped=false, vocabKnown=JSON.parse(localStorage.getItem("ltVocabKnown")||"{}");
+function showVocab(){
+ subject="Vokabeln";
+ document.getElementById("mathTab").classList.remove("active");
+ document.getElementById("engTab").classList.remove("active");
+ document.getElementById("vocabTab").classList.add("active");
+ document.getElementById("topicSelect").parentElement.querySelector(".eyebrow").style.display="none";
+ document.getElementById("topicSelect").style.display="none";
+ document.getElementById("levelPills").style.display="none";
+ document.getElementById("progressText").textContent=Object.keys(vocabKnown).length+" Vokabeln gelernt";
+ document.getElementById("progressPercent").textContent=Object.keys(vocabKnown).length+" gelernt";
+ document.getElementById("progressBar").style.width=Math.min(100,Object.keys(vocabKnown).length/30*100)+"%";
+ renderVocab();
+}
+function renderVocab(){
+ const words=vocabSets[vocabSet]||vocabSets.Alltag;
+ if(vocabIndex>=words.length) vocabIndex=0;
+ const word=words[vocabIndex], front=vocabDirection==="en-de"?word[0]:word[1], back=vocabDirection==="en-de"?word[1]:word[0];
+ const key=vocabSet+"_"+vocabIndex;
+ const known=!!vocabKnown[key];
+ document.getElementById("content").innerHTML=`
+ <section class="panel">
+ <div class="eyebrow">Vokabeltrainer</div><h2>Vokabeln lernen</h2>
+ <p>Wähle einen Bereich und präge dir die Wörter mit Karteikarten ein. Überlege erst selbst, bevor du die Lösung aufdeckst.</p>
+ <label class="eyebrow" for="vocabSelect">Vokabelbereich</label>
+ <select id="vocabSelect" onchange="vocabSet=this.value;vocabIndex=0;vocabFlipped=false;renderVocab()">
+ ${Object.keys(vocabSets).map(s=>`<option ${s===vocabSet?"selected":""}>${s}</option>`).join("")}
+ </select>
+ <div class="pills">
+ <button class="pill ${vocabDirection==="en-de"?"active":""}" onclick="vocabDirection='en-de';vocabFlipped=false;renderVocab()">Englisch → Deutsch</button>
+ <button class="pill ${vocabDirection==="de-en"?"active":""}" onclick="vocabDirection='de-en';vocabFlipped=false;renderVocab()">Deutsch → Englisch</button>
+ </div>
+ <div class="example" style="text-align:center;padding:28px 14px">
+ <div class="eyebrow">Karte ${vocabIndex+1} von ${words.length}</div>
+ <div style="font-size:27px;font-weight:800;margin:18px 0">${vocabFlipped?back:front}</div>
+ ${vocabFlipped?`<div class="answerline">Übersetzung</div>`:`<div class="muted">Denk kurz nach und decke dann die Lösung auf.</div>`}
+ </div>
+ <div class="actions">
+ <button class="btn" onclick="vocabFlipped=!vocabFlipped;renderVocab()">${vocabFlipped?"Vorderseite anzeigen":"Lösung anzeigen"}</button>
+ <button class="btn secondary" onclick="vocabKnown[key]=true;localStorage.setItem('ltVocabKnown',JSON.stringify(vocabKnown));nextVocab()">Kann ich ✓</button>
+ <button class="btn secondary" onclick="nextVocab()">Nächste →</button>
+ </div>
+ <p class="muted" style="margin-top:10px">Markiere „Kann ich“, wenn du die Vokabel sicher weißt. Du kannst die Karten beliebig oft wiederholen.</p>
+ </section>
+ <section class="panel">
+ <div class="eyebrow">Aktives Abfragen</div><h2>Teste dich selbst</h2>
+ <p>Schreibe die Übersetzung für: <strong>${front}</strong></p>
+ <input id="vocabAnswer" placeholder="Deine Übersetzung" autocomplete="off">
+ <div class="actions"><button class="btn" onclick="checkVocab('${encodeURIComponent(back)}')">Antwort prüfen</button></div>
+ <div id="vocabFeedback"></div>
+ </section>`;
+}
+function nextVocab(){const words=vocabSets[vocabSet];vocabIndex=(vocabIndex+1)%words.length;vocabFlipped=false;renderVocab();}
+function checkVocab(encoded){
+ const expected=decodeURIComponent(encoded), answer=document.getElementById("vocabAnswer").value.trim().toLowerCase();
+ const ok=answer===expected.toLowerCase();
+ document.getElementById("vocabFeedback").innerHTML=ok
+ ? `<div class="feedback good">✓ Richtig! Sehr gut.</div>`
+ : `<div class="feedback bad">Noch nicht ganz. Lösung: <strong>${expected}</strong></div>`;
+ if(ok){const key=vocabSet+"_"+vocabIndex;vocabKnown[key]=true;localStorage.setItem("ltVocabKnown",JSON.stringify(vocabKnown));}
+}
+
+setSubject("Mathe");
+</script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));}</script></body></html>

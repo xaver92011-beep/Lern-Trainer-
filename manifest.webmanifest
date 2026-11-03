@@ -1,0 +1,17 @@
+{
+  "name": "Lerntrainer Mathe & Englisch",
+  "short_name": "Lerntrainer",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f3f6f2",
+  "theme_color": "#173d2b",
+  "description": "Dein Lerntrainer für Mathe, Englisch und Vokabeln.",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
